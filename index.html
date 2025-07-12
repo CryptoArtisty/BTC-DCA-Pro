@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced DCA Strategies for Crypto Trading</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2b6cb0;
+            --secondary: #4299e1;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --bg-color: #f8f9fa;
+            --text-color: #2d3748;
+            --card-bg: white;
+            --border-color: #e2e8f0;
+            --hover-color: #edf2f7;
+        }
+        .dark-mode {
+            --primary: #63b3ed;
+            --secondary: #90cdf4;
+            --success: #68d391;
+            --warning: #f6ad55;
+            --danger: #fc8181;
+            --dark: #e2e8f0;
+            --light: #4a5568;
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --card-bg: #2d3748;
+            --border-color: #4a5568;
+            --hover-color: #4a5568;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        .price-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border: 1px solid var(--border-color);
+        }
+        .price-main {
+            font-size: 1.4rem;
+        }
+        .price-change {
+            font-size: 1rem;
+        }
+        .strategy-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+            border: 1px solid var(--border-color);
+        }
+        .strategy-title {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .strategy-active {
+            background-color: var(--success);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .strategy-inactive {
+            background-color: var(--danger);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        button:hover {
+            background-color: var(--secondary);
+        }
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .alert-container {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            width: 90%;
+            max-width: 350px;
+            z-index: 1000;
+        }
+        .alert {
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            border-radius: 6px;
+            color: white;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert i {
+            font-size: 1.2rem;
+        }
+        .alert-buy {
+            background-color: var(--success);
+        }
+        .alert-sell {
+            background-color: var(--danger);
+        }
+        .alert-info {
+            background-color: var(--secondary);
+        }
+        .alert-warning {
+            background-color: var(--warning);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .signal-history {
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+        }
+        .signal-item {
+            padding: 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .signal-item:last-child {
+            border-bottom: none;
+        }
+        .signal-time {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        .signal-buy .signal-action {
+            color: var(--success);
+        }
+        .signal-sell .signal-action {
+            color: var(--danger);
+        }
+        .signal-details {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 2px;
+        }
+        .tab {
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .rules {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--danger);
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+        .rules h3 {
+            margin-top: 0;
+            color: var(--danger);
+            font-size: 1.1rem;
+        }
+        .rules ul {
+            padding-left: 1.2rem;
+            margin-bottom: 0;
+        }
+        .rules li {
+            margin-bottom: 0.4rem;
+        }
+        .portfolio-summary {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        .portfolio-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .portfolio-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .portfolio-label {
+            font-weight: 600;
+        }
+        .positive {
+            color: var(--success);
+        }
+        .negative {
+            color: var(--danger);
+        }
+        .paper-trading-controls {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+        .flex-row .form-group {
+            flex: 1;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: var(--success);
+        }
+        .status-inactive {
+            background-color: var(--danger);
+        }
+        .data-source {
+            font-size: 0.8rem;
+            text-align: right;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .mobile-collapse {
+            display: none;
+        }
+        .mobile-collapse.active {
+            display: block;
+        }
+        .collapse-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+        .collapse-toggle i {
+            transition: transform 0.2s;
+        }
+        .collapse-toggle.active i {
+            transform: rotate(180deg);
+        }
+        .manual-trade-form {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        .trade-history {
+            margin-top: 1rem;
+        }
+        .trade-item {
+            background-color: var(--card-bg);
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        .trade-item-buy {
+            border-left: 4px solid var(--success);
+        }
+        .trade-item-sell {
+            border-left: 4px solid var(--danger);
+        }
+        .trade-details {
+            flex: 1;
+        }
+        .trade-amount {
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+        .trade-time {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+        .delete-trade {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .performance-dashboard {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .performance-card {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .performance-title {
+            font-size: 1rem;
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .metric-label {
+            font-weight: 600;
+        }
+        .metric-value {
+            font-weight: bold;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                font-size: 17px;
+            }
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            .price-display {
+                flex-direction: row;
+                justify-content: center;
+                align-items: baseline;
+                gap: 15px;
+            }
+            .price-main {
+                font-size: 1.6rem;
+            }
+            .strategy-title {
+                font-size: 1.3rem;
+            }
+            button {
+                width: auto;
+            }
+            .mobile-collapse {
+                display: block;
+            }
+            .collapse-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Advanced DCA Strategies for Crypto</h1>
+            <div class="subtitle">Real-time Bitcoin Trading with Modified DCA Strategies</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="paper-trading-controls">
+            <h2>Paper Trading Simulation</h2>
+            <div class="flex-row">
+                <div class="form-group">
+                    <label for="initialCapital">Initial Capital ($)</label>
+                    <input type="number" id="initialCapital" value="1000" min="100">
+                </div>
+                <div class="form-group">
+                    <label for="tradeFrequency">Check Frequency (min)</label>
+                    <select id="tradeFrequency">
+                        <option value="1">1</option>
+                        <option value="5" selected>5</option>
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Auto Trading: <span id="autoTradeStatus"><span class="status-indicator status-inactive"></span>Inactive</span></label>
+                <div class="flex-row">
+                    <button id="startAutoTrading">Start Auto Trading</button>
+                    <button id="stopAutoTrading" class="btn-sm">Stop</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-dashboard">
+            <h2>Strategy Performance Dashboard</h2>
+            <div class="performance-grid" id="performanceDashboard">
+                <!-- Performance metrics will be inserted here -->
+            </div>
+        </div>
+
+        <div class="price-display">
+            <div class="price-main">BTC: $<span id="priceDisplay">Loading...</span></div>
+            <div class="price-change"><span id="priceChange"></span> <span id="priceSource" class="data-source"></span></div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="strategies">Strategies</div>
+            <div class="tab" data-tab="signals">Signals</div>
+            <div class="tab" data-tab="portfolio">Portfolio</div>
+            <div class="tab" data-tab="manual">Manual Trades</div>
+        </div>
+
+        <div class="tab-content active" id="strategies-tab">
+            <div class="strategy-card" id="strategy1">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">1. High-Frequency Micro-DCA <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Instead of monthly buys, invest small amounts daily during dips using RSI or moving average triggers.</p>
+                    
+                    <div class="form-group">
+                        <label for="hfAmount">Daily Investment Amount ($)</label>
+                        <input type="number" id="hfAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="hfTrigger">Buy Trigger</label>
+                        <select id="hfTrigger">
+                            <option value="rsi">RSI < 40</option>
+                            <option value="ma">Price below 20-day MA</option>
+                            <option value="both">Both conditions</option>
+                        </select>
+                    </div>
+                    <button class="activate-btn" data-strategy="1">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy2">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">2. DCA + Take-Profit Recycling <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>DCA into BTC but sell portions at every 10% price spike and reinvest profits.</p>
+                    
+                    <div class="form-group">
+                        <label for="tpAmount">Daily Investment Amount ($)</label>
+                        <input type="number" id="tpAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="tpPercent">Sell Percentage at 10% Spike</label>
+                        <input type="number" id="tpPercent" value="20" min="1" max="100">%
+                    </div>
+                    <button class="activate-btn" data-strategy="2">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy3">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">3. Volatility-Weighted DCA <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Increase DCA amounts when BTC is down significantly in a day.</p>
+                    
+                    <div class="form-group">
+                        <label for="vwBaseAmount">Base Daily Amount ($)</label>
+                        <input type="number" id="vwBaseAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="vwDropThreshold">Drop Threshold for Increase (%)</label>
+                        <input type="number" id="vwDropThreshold" value="5" min="1">%
+                    </div>
+                    <div class="form-group">
+                        <label for="vwIncreasedAmount">Increased Amount ($)</label>
+                        <input type="number" id="vwIncreasedAmount" value="20" min="1">
+                    </div>
+                    <button class="activate-btn" data-strategy="3">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy4">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">4. DCA + Swing Profit-Taking <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>DCA into BTC but sell portions at key resistance levels.</p>
+                    
+                    <div class="form-group">
+                        <label for="swingAmount">Daily Investment Amount ($)</label>
+                        <input type="number" id="swingAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="swingResistance">Resistance Levels (comma separated, $)</label>
+                        <input type="text" id="swingResistance" value="60000,65000,70000">
+                    </div>
+                    <div class="form-group">
+                        <label for="swingSellPercent">Sell Percentage at Resistance (%)</label>
+                        <input type="number" id="swingSellPercent" value="30" min="1" max="100">%
+                    </div>
+                    <button class="activate-btn" data-strategy="4">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy5">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">5. Leveraged DCA (Advanced) <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Use leveraged futures positions during dips (higher risk).</p>
+                    
+                    <div class="form-group">
+                        <label for="levAmount">Position Size ($)</label>
+                        <input type="number" id="levAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="levLeverage">Leverage Multiplier</label>
+                        <select id="levLeverage">
+                            <option value="2">2x</option>
+                            <option value="3" selected>3x</option>
+                            <option value="5">5x</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="levTrigger">Buy Trigger (RSI)</label>
+                        <input type="number" id="levTrigger" value="35" min="1" max="100">
+                    </div>
+                    <button class="activate-btn" data-strategy="5">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy6">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">6. AI/Algorithm-Assisted DCA <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Automated buying and selling based on RSI indicators.</p>
+                    
+                    <div class="form-group">
+                        <label for="aiAmount">Investment Amount per Signal ($)</label>
+                        <input type="number" id="aiAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="aiBuyRSI">Buy when RSI below</label>
+                        <input type="number" id="aiBuyRSI" value="35" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="aiSellRSI">Sell when RSI above</label>
+                        <input type="number" id="aiSellRSI" value="70" min="1" max="100">
+                    </div>
+                    <button class="activate-btn" data-strategy="6">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy7">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">7. DCA + Dollar-Cost Selling <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Buy daily but also sell small amounts when profitable.</p>
+                    
+                    <div class="form-group">
+                        <label for="dcsBuyAmount">Daily Buy Amount ($)</label>
+                        <input type="number" id="dcsBuyAmount" value="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="dcsSellAmount">Daily Sell Amount ($)</label>
+                        <input type="number" id="dcsSellAmount" value="5" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="dcsProfitThreshold">Only sell when price is above entry by (%)</label>
+                        <input type="number" id="dcsProfitThreshold" value="5" min="0">%
+                    </div>
+                    <button class="activate-btn" data-strategy="7">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="strategy-card" id="strategy8">
+                <div class="collapse-toggle">
+                    <h3 class="strategy-title">8. Hyper-Aggressive DCA <span class="strategy-inactive">Inactive</span></h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="mobile-collapse active">
+                    <p>Deploy larger amounts at key support levels during dips.</p>
+                    
+                    <div class="form-group">
+                        <label for="haTotalAmount">Total Allocation ($)</label>
+                        <input type="number" id="haTotalAmount" value="100" min="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="haFirstBuy">First Buy at Drop (%)</label>
+                        <input type="number" id="haFirstBuy" value="10" min="1">%
+                    </div>
+                    <div class="form-group">
+                        <label for="haSecondBuy">Second Buy at Drop (%)</label>
+                        <input type="number" id="haSecondBuy" value="15" min="1">%
+                    </div>
+                    <button class="activate-btn" data-strategy="8">Activate Strategy</button>
+                </div>
+            </div>
+
+            <div class="rules">
+                <h3>Critical Rules for Aggressive DCA</h3>
+                <ul>
+                    <li><strong>Always keep a cash reserve</strong> (don't go all-in at once)</li>
+                    <li><strong>Take profits systematically</strong> (avoid greed)</li>
+                    <li><strong>Avoid emotional buys</strong> (stick to the plan)</li>
+                    <li><strong>Track average entry price</strong> (know when to sell)</li>
+                </ul>
+                <p><strong>Note:</strong> Pure DCA is slow, but modified DCA + profit-taking can accelerate growth. The key is buying low, selling high in cycles, and compounding gains.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="signals-tab">
+            <h2>Trade Signals</h2>
+            <div class="flex-row">
+                <button id="clearSignals">Clear History</button>
+                <button id="exportSignals">Export Signals</button>
+            </div>
+            <div class="signal-history" id="signalHistory">
+                <div class="signal-item">
+                    <div class="signal-time">No signals yet. Activate strategies to begin.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="portfolio-tab">
+            <h2>Paper Portfolio Summary</h2>
+            <div class="portfolio-summary">
+                <div class="portfolio-item">
+                    <span class="portfolio-label">BTC Holdings:</span>
+                    <span id="btcHoldings">0</span> BTC
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Cash Reserve:</span>
+                    $<span id="cashReserve">1000</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Average Buy Price:</span>
+                    $<span id="avgBuyPrice">0</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Current Value:</span>
+                    $<span id="portfolioValue">1000</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Profit/Loss:</span>
+                    <span id="profitLoss">0</span>%
+                </div>
+            </div>
+            <h3>Transaction History</h3>
+            <div class="signal-history" id="transactionHistory">
+                <div class="signal-item">
+                    <div class="signal-time">No transactions yet.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="manual-tab">
+            <h2>Manual Trades</h2>
+            <div class="manual-trade-form">
+                <div class="flex-row">
+                    <div class="form-group">
+                        <label for="tradeType">Trade Type</label>
+                        <select id="tradeType">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeAmount">Amount ($)</label>
+                        <input type="number" id="tradeAmount" min="0.01" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tradePrice">Price per BTC ($)</label>
+                    <input type="number" id="tradePrice" min="0.01" step="0.01">
+                </div>
+                <button id="addManualTrade">Add Trade</button>
+            </div>
+
+            <div class="portfolio-summary">
+                <h3>Manual Portfolio Summary</h3>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">BTC Holdings:</span>
+                    <span id="manualBtcHoldings">0</span> BTC
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Cash Reserve:</span>
+                    $<span id="manualCashReserve">0</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Average Buy Price:</span>
+                    $<span id="manualAvgBuyPrice">0</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Current Value:</span>
+                    $<span id="manualPortfolioValue">0</span>
+                </div>
+                <div class="portfolio-item">
+                    <span class="portfolio-label">Profit/Loss:</span>
+                    <span id="manualProfitLoss">0</span>%
+                </div>
+            </div>
+
+            <div class="trade-history">
+                <h3>Trade History</h3>
+                <div id="manualTradeHistory">
+                    <div class="signal-item">
+                        <div class="signal-time">No manual trades yet.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="alert-container" id="alertContainer">
+        <!-- Alerts will appear here -->
+    </div>
+
+    <script>
+        // Global variables
+        let currentPrice = 0;
+        let previousPrice = 0;
+        let activeStrategies = [];
+        let signalHistory = [];
+        let transactionHistory = [];
+        let btcHoldings = 0;
+        let cashReserve = 1000;
+        let totalInvested = 0;
+        let totalBtcBought = 0;
+        let priceHistory = [];
+        let rsiHistory = [];
+        let autoTradingInterval;
+        let isAutoTrading = false;
+        let priceUpdateInterval;
+        let ma20History = [];
+        let dataSource = '';
+        let strategyPerformance = {};
+        
+        // Manual trade variables
+        let manualTrades = [];
+        let manualBtcHoldings = 0;
+        let manualCashReserve = 0;
+        let manualTotalInvested = 0;
+        let manualTotalBtcBought = 0;
+        let manualInitialCapital = 0;
+        
+        // DOM elements
+        const priceDisplay = document.getElementById('priceDisplay');
+        const priceChange = document.getElementById('priceChange');
+        const priceSource = document.getElementById('priceSource');
+        const signalHistoryEl = document.getElementById('signalHistory');
+        const transactionHistoryEl = document.getElementById('transactionHistory');
+        const alertContainer = document.getElementById('alertContainer');
+        const btcHoldingsEl = document.getElementById('btcHoldings');
+        const cashReserveEl = document.getElementById('cashReserve');
+        const avgBuyPriceEl = document.getElementById('avgBuyPrice');
+        const portfolioValueEl = document.getElementById('portfolioValue');
+        const profitLossEl = document.getElementById('profitLoss');
+        const autoTradeStatus = document.getElementById('autoTradeStatus');
+        const themeToggle = document.getElementById('themeToggle');
+        const performanceDashboard = document.getElementById('performanceDashboard');
+        
+        // Manual trade elements
+        const manualBtcHoldingsEl = document.getElementById('manualBtcHoldings');
+        const manualCashReserveEl = document.getElementById('manualCashReserve');
+        const manualAvgBuyPriceEl = document.getElementById('manualAvgBuyPrice');
+        const manualPortfolioValueEl = document.getElementById('manualPortfolioValue');
+        const manualProfitLossEl = document.getElementById('manualProfitLoss');
+        const manualTradeHistoryEl = document.getElementById('manualTradeHistory');
+        
+        // Strategy names
+        const strategyNames = {
+            '1': 'High-Frequency Micro-DCA',
+            '2': 'DCA + Take-Profit Recycling',
+            '3': 'Volatility-Weighted DCA',
+            '4': 'DCA + Swing Profit-Taking',
+            '5': 'Leveraged DCA',
+            '6': 'AI-Assisted DCA',
+            '7': 'DCA + Dollar-Cost Selling',
+            '8': 'Hyper-Aggressive DCA'
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            initializePortfolio();
+            loadManualTrades();
+            startPriceUpdates();
+            initializeStrategyPerformance();
+            updatePerformanceDashboard();
+        });
+        
+        function setupEventListeners() {
+            // Tab functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Strategy activation
+            document.querySelectorAll('.activate-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const strategyId = this.dataset.strategy;
+                    const strategyCard = document.getElementById(`strategy${strategyId}`);
+                    const statusEl = strategyCard.querySelector('.strategy-title span');
+                    
+                    if (statusEl.classList.contains('strategy-inactive')) {
+                        // Activate strategy
+                        statusEl.classList.remove('strategy-inactive');
+                        statusEl.classList.add('strategy-active');
+                        statusEl.textContent = 'Active';
+                        this.textContent = 'Deactivate';
+                        
+                        if (!activeStrategies.includes(strategyId)) {
+                            activeStrategies.push(strategyId);
+                        }
+                        
+                        showAlert(`Strategy ${strategyId} activated`, 'info');
+                    } else {
+                        // Deactivate strategy
+                        statusEl.classList.remove('strategy-active');
+                        statusEl.classList.add('strategy-inactive');
+                        statusEl.textContent = 'Inactive';
+                        this.textContent = 'Activate Strategy';
+                        
+                        activeStrategies = activeStrategies.filter(id => id !== strategyId);
+                        
+                        showAlert(`Strategy ${strategyId} deactivated`, 'info');
+                    }
+                });
+            });
+            
+            // Auto trading controls
+            document.getElementById('startAutoTrading').addEventListener('click', startAutoTrading);
+            document.getElementById('stopAutoTrading').addEventListener('click', stopAutoTrading);
+            
+            // Clear signals
+            document.getElementById('clearSignals').addEventListener('click', clearSignalHistory);
+            
+            // Export signals
+            document.getElementById('exportSignals').addEventListener('click', exportSignals);
+            
+            // Mobile collapse
+            document.querySelectorAll('.collapse-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    content.classList.toggle('active');
+                });
+            });
+            
+            // Initialize portfolio with user's input
+            document.getElementById('initialCapital').addEventListener('change', function() {
+                cashReserve = parseFloat(this.value);
+                updatePortfolio();
+            });
+            
+            // Manual trade form
+            document.getElementById('addManualTrade').addEventListener('click', addManualTrade);
+            
+            // Load current price into manual trade form
+            document.getElementById('tradePrice').addEventListener('focus', function() {
+                if (currentPrice > 0 && this.value === '') {
+                    this.value = currentPrice.toFixed(2);
+                }
+            });
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+        
+        function initializeStrategyPerformance() {
+            for (let i = 1; i <= 8; i++) {
+                strategyPerformance[i.toString()] = {
+                    name: strategyNames[i.toString()],
+                    active: false,
+                    totalProfit: 0,
+                    trades: 0,
+                    wins: 0,
+                    buySignals: 0,
+                    sellSignals: 0,
+                    totalHoldTime: 0,
+                    lastBuyPrice: 0,
+                    lastBuyTime: null
+                };
+            }
+        }
+        
+        function updatePerformanceDashboard() {
+            performanceDashboard.innerHTML = '';
+            
+            activeStrategies.forEach(strategyId => {
+                const perf = strategyPerformance[strategyId];
+                const winRate = perf.trades > 0 ? (perf.wins / perf.trades) * 100 : 0;
+                const avgHoldTime = perf.trades > 0 ? (perf.totalHoldTime / perf.trades) : 0;
+                
+                const card = document.createElement('div');
+                card.className = 'performance-card';
+                
+                card.innerHTML = `
+                    <h3 class="performance-title">${perf.name}</h3>
+                    <div class="metric">
+                        <span class="metric-label">Status:</span>
+                        <span class="metric-value">${perf.active ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Profit:</span>
+                        <span class="metric-value ${perf.totalProfit >= 0 ? 'positive' : 'negative'}">$${perf.totalProfit.toFixed(2)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Win Rate:</span>
+                        <span class="metric-value">${winRate.toFixed(1)}%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Avg Hold Time:</span>
+                        <span class="metric-value">${formatTime(avgHoldTime)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Buy Signals:</span>
+                        <span class="metric-value">${perf.buySignals}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Sell Signals:</span>
+                        <span class="metric-value">${perf.sellSignals}</span>
+                    </div>
+                `;
+                
+                performanceDashboard.appendChild(card);
+            });
+            
+            if (activeStrategies.length === 0) {
+                performanceDashboard.innerHTML = '<div class="performance-card"><p>No active strategies. Activate strategies to see performance metrics.</p></div>';
+            }
+        }
+        
+        function formatTime(seconds) {
+            if (seconds < 60) return `${seconds.toFixed(0)}s`;
+            if (seconds < 3600) return `${(seconds / 60).toFixed(0)}m`;
+            if (seconds < 86400) return `${(seconds / 3600).toFixed(1)}h`;
+            return `${(seconds / 86400).toFixed(1)}d`;
+        }
+        
+        function initializePortfolio() {
+            cashReserve = parseFloat(document.getElementById('initialCapital').value);
+            updatePortfolio();
+        }
+        
+        function loadManualTrades() {
+            const savedTrades = localStorage.getItem('manualTrades');
+            const savedPortfolio = localStorage.getItem('manualPortfolio');
+            
+            if (savedTrades) {
+                manualTrades = JSON.parse(savedTrades);
+                updateManualTradeHistory();
+            }
+            
+            if (savedPortfolio) {
+                const portfolio = JSON.parse(savedPortfolio);
+                manualBtcHoldings = portfolio.btcHoldings || 0;
+                manualCashReserve = portfolio.cashReserve || 0;
+                manualTotalInvested = portfolio.totalInvested || 0;
+                manualTotalBtcBought = portfolio.totalBtcBought || 0;
+                manualInitialCapital = portfolio.initialCapital || 0;
+                updateManualPortfolio();
+            }
+        }
+        
+        function saveManualTrades() {
+            localStorage.setItem('manualTrades', JSON.stringify(manualTrades));
+            localStorage.setItem('manualPortfolio', JSON.stringify({
+                btcHoldings: manualBtcHoldings,
+                cashReserve: manualCashReserve,
+                totalInvested: manualTotalInvested,
+                totalBtcBought: manualTotalBtcBought,
+                initialCapital: manualInitialCapital
+            }));
+        }
+        
+        function startPriceUpdates() {
+            // Get initial price
+            fetchBitcoinPrice();
+            
+            // Set up periodic price updates (every minute)
+            priceUpdateInterval = setInterval(fetchBitcoinPrice, 60000);
+        }
+        
+        async function fetchBitcoinPrice() {
+            try {
+                // Try Binance first
+                const binanceResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                if (binanceResponse.ok) {
+                    const data = await binanceResponse.json();
+                    updatePrice(parseFloat(data.price), 'Binance');
+                    return;
+                }
+                
+                // Fallback to CoinGecko
+                const coingeckoResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                if (coingeckoResponse.ok) {
+                    const data = await coingeckoResponse.json();
+                    updatePrice(data.bitcoin.usd, 'CoinGecko');
+                    return;
+                }
+                
+                throw new Error('Both APIs failed');
+            } catch (error) {
+                console.error('Error fetching Bitcoin price:', error);
+                priceSource.textContent = 'Failed to fetch price';
+            }
+        }
+        
+        function updatePrice(newPrice, source) {
+            previousPrice = currentPrice;
+            currentPrice = newPrice;
+            priceHistory.push(currentPrice);
+            dataSource = source;
+            
+            // Keep price history to 100 periods for calculations
+            if (priceHistory.length > 100) {
+                priceHistory.shift();
+            }
+            
+            updatePriceDisplay();
+            calculateIndicators();
+            
+            // Check strategies if auto trading is active
+            if (isAutoTrading) {
+                checkStrategies();
+            }
+            
+            // Update manual portfolio value
+            updateManualPortfolio();
+        }
+        
+        function updatePriceDisplay() {
+            priceDisplay.textContent = currentPrice.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            priceSource.textContent = `via ${dataSource}`;
+            
+            if (previousPrice > 0) {
+                const change = currentPrice - previousPrice;
+                const changePct = (change / previousPrice) * 100;
+                
+                priceChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePct.toFixed(2)}%)`;
+                priceChange.style.color = change >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+        }
+        
+        function calculateIndicators() {
+            // Calculate RSI (14-period)
+            if (priceHistory.length >= 15) {
+                let gains = 0;
+                let losses = 0;
+                
+                for (let i = 1; i < 15; i++) {
+                    const change = priceHistory[i] - priceHistory[i-1];
+                    if (change > 0) {
+                        gains += change;
+                    } else {
+                        losses += Math.abs(change);
+                    }
+                }
+                
+                const avgGain = gains / 14;
+                const avgLoss = losses / 14;
+                const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+                const rsi = 100 - (100 / (1 + rs));
+                
+                rsiHistory.push(rsi);
+                if (rsiHistory.length > 10) {
+                    rsiHistory.shift();
+                }
+            }
+            
+            // Calculate 20-day MA
+            if (priceHistory.length >= 20) {
+                const ma20 = priceHistory.slice(-20).reduce((sum, price) => sum + price, 0) / 20;
+                ma20History.push(ma20);
+                if (ma20History.length > 10) {
+                    ma20History.shift();
+                }
+            }
+        }
+        
+        function startAutoTrading() {
+            if (isAutoTrading) return;
+            
+            const frequencyMinutes = parseInt(document.getElementById('tradeFrequency').value);
+            isAutoTrading = true;
+            
+            autoTradeStatus.innerHTML = '<span class="status-indicator status-active"></span>Active';
+            document.getElementById('startAutoTrading').textContent = 'Auto Trading Running';
+            
+            // Run immediately and then at intervals
+            checkStrategies();
+            autoTradingInterval = setInterval(checkStrategies, frequencyMinutes * 60000);
+            
+            showAlert(`Auto trading started (checking every ${frequencyMinutes} minutes)`, 'info');
+        }
+        
+        function stopAutoTrading() {
+            if (!isAutoTrading) return;
+            
+            clearInterval(autoTradingInterval);
+            isAutoTrading = false;
+            
+            autoTradeStatus.innerHTML = '<span class="status-indicator status-inactive"></span>Inactive';
+            document.getElementById('startAutoTrading').textContent = 'Start Auto Trading';
+            
+            showAlert('Auto trading stopped', 'info');
+        }
+        
+        function checkStrategies() {
+            if (activeStrategies.length === 0) return;
+            
+            activeStrategies.forEach(strategyId => {
+                strategyPerformance[strategyId].active = true;
+                
+                switch (strategyId) {
+                    case '1':
+                        checkHighFrequencyDCA();
+                        break;
+                    case '2':
+                        checkTakeProfitRecycling();
+                        break;
+                    case '3':
+                        checkVolatilityWeightedDCA();
+                        break;
+                    case '4':
+                        checkSwingProfitTaking();
+                        break;
+                    case '5':
+                        checkLeveragedDCA();
+                        break;
+                    case '6':
+                        checkAlgorithmAssistedDCA();
+                        break;
+                    case '7':
+                        checkDollarCostSelling();
+                        break;
+                    case '8':
+                        checkHyperAggressiveDCA();
+                        break;
+                }
+            });
+            
+            updatePortfolio();
+            updatePerformanceDashboard();
+        }
+        
+        function checkHighFrequencyDCA() {
+            const strategyId = '1';
+            const amount = parseFloat(document.getElementById('hfAmount').value);
+            const trigger = document.getElementById('hfTrigger').value;
+            
+            let shouldBuy = false;
+            
+            if ((trigger === 'rsi' || trigger === 'both') && rsiHistory.length > 0) {
+                if (rsiHistory[rsiHistory.length - 1] < 40) {
+                    shouldBuy = true;
+                    strategyPerformance[strategyId].buySignals++;
+                }
+            }
+            
+            if ((trigger === 'ma' || trigger === 'both') && ma20History.length > 0) {
+                if (currentPrice < ma20History[ma20History.length - 1]) {
+                    shouldBuy = true;
+                    strategyPerformance[strategyId].buySignals++;
+                }
+            }
+            
+            if (shouldBuy && cashReserve >= amount) {
+                executeBuy(amount, `HF-DCA buy at $${currentPrice.toFixed(2)}`, strategyId);
+            }
+        }
+        
+        function checkTakeProfitRecycling() {
+            const strategyId = '2';
+            const amount = parseFloat(document.getElementById('tpAmount').value);
+            const sellPercent = parseFloat(document.getElementById('tpPercent').value) / 100;
+            
+            // First, check if we should buy
+            if (cashReserve >= amount) {
+                executeBuy(amount, `TP-DCA buy at $${currentPrice.toFixed(2)}`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+            
+            // Then check if we should sell
+            if (btcHoldings > 0 && priceHistory.length > 1) {
+                const prevPrice = priceHistory[priceHistory.length - 2];
+                const priceChangePct = ((currentPrice - prevPrice) / prevPrice) * 100;
+                
+                if (priceChangePct >= 10) {
+                    const btcToSell = btcHoldings * sellPercent;
+                    if (btcToSell > 0) {
+                        executeSell(btcToSell, `TP-DCA sell at 10% spike ($${currentPrice.toFixed(2)})`, strategyId);
+                        strategyPerformance[strategyId].sellSignals++;
+                    }
+                }
+            }
+        }
+        
+        function checkVolatilityWeightedDCA() {
+            const strategyId = '3';
+            const baseAmount = parseFloat(document.getElementById('vwBaseAmount').value);
+            const dropThreshold = parseFloat(document.getElementById('vwDropThreshold').value) / 100;
+            const increasedAmount = parseFloat(document.getElementById('vwIncreasedAmount').value);
+            
+            if (priceHistory.length < 2) return;
+            
+            const prevPrice = priceHistory[priceHistory.length - 2];
+            const priceDrop = (prevPrice - currentPrice) / prevPrice;
+            
+            const amount = priceDrop >= dropThreshold ? increasedAmount : baseAmount;
+            
+            if (cashReserve >= amount) {
+                executeBuy(amount, `VW-DCA buy (${priceDrop >= dropThreshold ? 'increased' : 'base'} amount) at $${currentPrice.toFixed(2)}`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+        }
+        
+        function checkSwingProfitTaking() {
+            const strategyId = '4';
+            const amount = parseFloat(document.getElementById('swingAmount').value);
+            const resistanceLevels = document.getElementById('swingResistance').value.split(',').map(Number).filter(n => !isNaN(n));
+            const sellPercent = parseFloat(document.getElementById('swingSellPercent').value) / 100;
+            
+            // First, check if we should buy
+            if (cashReserve >= amount) {
+                executeBuy(amount, `Swing-DCA buy at $${currentPrice.toFixed(2)}`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+            
+            // Then check resistance levels
+            if (btcHoldings > 0 && resistanceLevels.length > 0) {
+                resistanceLevels.forEach(level => {
+                    if (currentPrice >= level && currentPrice < level * 1.01) { // Within 1% of resistance
+                        const btcToSell = btcHoldings * sellPercent;
+                        if (btcToSell > 0) {
+                            executeSell(btcToSell, `Swing-DCA sell at resistance $${level} (current $${currentPrice.toFixed(2)})`, strategyId);
+                            strategyPerformance[strategyId].sellSignals++;
+                        }
+                    }
+                });
+            }
+        }
+        
+        function checkLeveragedDCA() {
+            const strategyId = '5';
+            const amount = parseFloat(document.getElementById('levAmount').value);
+            const leverage = parseInt(document.getElementById('levLeverage').value);
+            const triggerRSI = parseFloat(document.getElementById('levTrigger').value);
+            
+            if (rsiHistory.length > 0 && rsiHistory[rsiHistory.length - 1] < triggerRSI && cashReserve >= amount) {
+                const effectiveAmount = amount * leverage;
+                executeBuy(effectiveAmount, `Leveraged DCA (${leverage}x) buy at RSI ${rsiHistory[rsiHistory.length - 1].toFixed(1)} ($${currentPrice.toFixed(2)})`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+        }
+        
+        function checkAlgorithmAssistedDCA() {
+            const strategyId = '6';
+            const amount = parseFloat(document.getElementById('aiAmount').value);
+            const buyRSI = parseFloat(document.getElementById('aiBuyRSI').value);
+            const sellRSI = parseFloat(document.getElementById('aiSellRSI').value);
+            
+            if (rsiHistory.length > 0) {
+                const currentRSI = rsiHistory[rsiHistory.length - 1];
+                
+                if (currentRSI < buyRSI && cashReserve >= amount) {
+                    executeBuy(amount, `AI-DCA buy at RSI ${currentRSI.toFixed(1)} ($${currentPrice.toFixed(2)})`, strategyId);
+                    strategyPerformance[strategyId].buySignals++;
+                }
+                
+                if (currentRSI > sellRSI && btcHoldings > 0) {
+                    const btcToSell = btcHoldings * 0.5; // Sell half
+                    executeSell(btcToSell, `AI-DCA sell at RSI ${currentRSI.toFixed(1)} ($${currentPrice.toFixed(2)})`, strategyId);
+                    strategyPerformance[strategyId].sellSignals++;
+                }
+            }
+        }
+        
+        function checkDollarCostSelling() {
+            const strategyId = '7';
+            const buyAmount = parseFloat(document.getElementById('dcsBuyAmount').value);
+            const sellAmount = parseFloat(document.getElementById('dcsSellAmount').value);
+            const profitThreshold = parseFloat(document.getElementById('dcsProfitThreshold').value) / 100;
+            
+            // Always try to buy
+            if (cashReserve >= buyAmount) {
+                executeBuy(buyAmount, `DCS buy at $${currentPrice.toFixed(2)}`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+            
+            // Check if we should sell
+            if (btcHoldings > 0 && totalInvested > 0) {
+                const avgBuyPrice = totalInvested / totalBtcBought;
+                const currentProfit = (currentPrice - avgBuyPrice) / avgBuyPrice;
+                
+                if (currentProfit >= profitThreshold) {
+                    const btcToSell = sellAmount / currentPrice;
+                    if (btcToSell <= btcHoldings) {
+                        executeSell(btcToSell, `DCS sell at profit ${(currentProfit * 100).toFixed(1)}% ($${currentPrice.toFixed(2)})`, strategyId);
+                        strategyPerformance[strategyId].sellSignals++;
+                    }
+                }
+            }
+        }
+        
+        function checkHyperAggressiveDCA() {
+            const strategyId = '8';
+            const totalAmount = parseFloat(document.getElementById('haTotalAmount').value);
+            const firstBuyDrop = parseFloat(document.getElementById('haFirstBuy').value) / 100;
+            const secondBuyDrop = parseFloat(document.getElementById('haSecondBuy').value) / 100;
+            
+            // Find the highest price in recent history as reference
+            if (priceHistory.length < 5) return;
+            
+            const referencePrice = Math.max(...priceHistory.slice(-5));
+            const currentDrop = (referencePrice - currentPrice) / referencePrice;
+            
+            if (currentDrop >= firstBuyDrop && currentDrop < secondBuyDrop && cashReserve >= totalAmount * 0.5) {
+                const amount = totalAmount * 0.5;
+                executeBuy(amount, `HA-DCA first buy at ${(currentDrop * 100).toFixed(1)}% drop ($${currentPrice.toFixed(2)})`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+            
+            if (currentDrop >= secondBuyDrop && cashReserve >= totalAmount * 0.5) {
+                const amount = Math.min(cashReserve, totalAmount * 0.5);
+                executeBuy(amount, `HA-DCA second buy at ${(currentDrop * 100).toFixed(1)}% drop ($${currentPrice.toFixed(2)})`, strategyId);
+                strategyPerformance[strategyId].buySignals++;
+            }
+        }
+        
+        function executeBuy(amount, message, strategyId) {
+            if (cashReserve < amount) {
+                showAlert(`Insufficient funds for buy: $${amount.toFixed(2)} needed`, 'warning');
+                return;
+            }
+            
+            const btcBought = amount / currentPrice;
+            btcHoldings += btcBought;
+            cashReserve -= amount;
+            totalInvested += amount;
+            totalBtcBought += btcBought;
+            
+            // Update strategy performance
+            if (strategyId) {
+                strategyPerformance[strategyId].lastBuyPrice = currentPrice;
+                strategyPerformance[strategyId].lastBuyTime = new Date();
+                strategyPerformance[strategyId].trades++;
+            }
+            
+            showAlert(`BUY: ${message}`, 'buy');
+            addSignalToHistory(`BUY: ${message} - ${btcBought.toFixed(6)} BTC for $${amount.toFixed(2)}`);
+            addTransactionToHistory(`BUY ${btcBought.toFixed(6)} BTC @ $${currentPrice.toFixed(2)}`);
+        }
+        
+        function executeSell(btcAmount, message, strategyId) {
+            if (btcHoldings < btcAmount) {
+                showAlert(`Insufficient BTC for sell: ${btcAmount.toFixed(6)} BTC needed`, 'warning');
+                return;
+            }
+            
+            const amount = btcAmount * currentPrice;
+            btcHoldings -= btcAmount;
+            cashReserve += amount;
+            
+            // Update strategy performance
+            if (strategyId) {
+                const perf = strategyPerformance[strategyId];
+                const profit = amount - (btcAmount * perf.lastBuyPrice);
+                perf.totalProfit += profit;
+                
+                if (profit > 0) {
+                    perf.wins++;
+                }
+                
+                if (perf.lastBuyTime) {
+                    const holdTime = (new Date() - perf.lastBuyTime) / 1000; // in seconds
+                    perf.totalHoldTime += holdTime;
+                }
+            }
+            
+            showAlert(`SELL: ${message}`, 'sell');
+            addSignalToHistory(`SELL: ${message} - ${btcAmount.toFixed(6)} BTC for $${amount.toFixed(2)}`);
+            addTransactionToHistory(`SELL ${btcAmount.toFixed(6)} BTC @ $${currentPrice.toFixed(2)}`);
+        }
+        
+        function addManualTrade() {
+            const tradeType = document.getElementById('tradeType').value;
+            const amount = parseFloat(document.getElementById('tradeAmount').value);
+            const price = parseFloat(document.getElementById('tradePrice').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('Please enter a valid amount', 'warning');
+                return;
+            }
+            
+            if (isNaN(price) || price <= 0) {
+                showAlert('Please enter a valid price', 'warning');
+                return;
+            }
+            
+            const now = new Date();
+            const timestamp = now.toLocaleString();
+            const btcAmount = amount / price;
+            
+            const trade = {
+                type: tradeType,
+                amount: amount,
+                price: price,
+                btcAmount: btcAmount,
+                timestamp: timestamp
+            };
+            
+            manualTrades.unshift(trade);
+            
+            // Update manual portfolio
+            if (tradeType === 'buy') {
+                manualBtcHoldings += btcAmount;
+                manualCashReserve -= amount;
+                manualTotalInvested += amount;
+                manualTotalBtcBought += btcAmount;
+                
+                if (manualInitialCapital === 0) {
+                    manualInitialCapital = manualCashReserve + amount;
+                }
+            } else {
+                manualBtcHoldings -= btcAmount;
+                manualCashReserve += amount;
+            }
+            
+            updateManualTradeHistory();
+            updateManualPortfolio();
+            saveManualTrades();
+            
+            // Clear form
+            document.getElementById('tradeAmount').value = '';
+            
+            showAlert(`Manual ${tradeType.toUpperCase()} added: ${btcAmount.toFixed(6)} BTC @ $${price.toFixed(2)}`, tradeType === 'buy' ? 'buy' : 'sell');
+        }
+        
+        function deleteManualTrade(index) {
+            const trade = manualTrades[index];
+            
+            // Reverse the trade's effect on the portfolio
+            if (trade.type === 'buy') {
+                manualBtcHoldings -= trade.btcAmount;
+                manualCashReserve += trade.amount;
+                manualTotalInvested -= trade.amount;
+                manualTotalBtcBought -= trade.btcAmount;
+            } else {
+                manualBtcHoldings += trade.btcAmount;
+                manualCashReserve -= trade.amount;
+            }
+            
+            // Remove the trade
+            manualTrades.splice(index, 1);
+            
+            updateManualTradeHistory();
+            updateManualPortfolio();
+            saveManualTrades();
+            
+            showAlert('Trade deleted', 'info');
+        }
+        
+        function updateManualTradeHistory() {
+            manualTradeHistoryEl.innerHTML = '';
+            
+            if (manualTrades.length === 0) {
+                manualTradeHistoryEl.innerHTML = '<div class="signal-item"><div class="signal-time">No manual trades yet.</div></div>';
+                return;
+            }
+            
+            manualTrades.forEach((trade, index) => {
+                const tradeEl = document.createElement('div');
+                tradeEl.className = `trade-item trade-item-${trade.type}`;
+                
+                tradeEl.innerHTML = `
+                    <div class="trade-details">
+                        <div>${trade.type.toUpperCase()} ${trade.btcAmount.toFixed(6)} BTC @ $${trade.price.toFixed(2)}</div>
+                        <div class="trade-time">${trade.timestamp}</div>
+                    </div>
+                    <div class="trade-amount">$${trade.amount.toFixed(2)}</div>
+                    <button class="delete-trade" data-index="${index}"><i class="fas fa-trash"></i></button>
+                `;
+                
+                manualTradeHistoryEl.appendChild(tradeEl);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-trade').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    deleteManualTrade(index);
+                });
+            });
+        }
+        
+        function updateManualPortfolio() {
+            manualBtcHoldingsEl.textContent = manualBtcHoldings.toFixed(6);
+            manualCashReserveEl.textContent = manualCashReserve.toFixed(2);
+            
+            const manualAvgBuyPrice = manualTotalBtcBought > 0 ? manualTotalInvested / manualTotalBtcBought : 0;
+            manualAvgBuyPriceEl.textContent = manualAvgBuyPrice.toFixed(2);
+            
+            const manualPortfolioValue = manualCashReserve + (manualBtcHoldings * currentPrice);
+            manualPortfolioValueEl.textContent = manualPortfolioValue.toFixed(2);
+            
+            // Calculate profit/loss based on initial capital and current value
+            let manualProfitLoss = 0;
+            if (manualInitialCapital > 0) {
+                manualProfitLoss = ((manualPortfolioValue - manualInitialCapital) / manualInitialCapital) * 100;
+            } else if (manualTrades.length > 0) {
+                // If no initial capital set (legacy data), calculate based on total invested
+                manualProfitLoss = ((manualPortfolioValue - manualTotalInvested) / manualTotalInvested) * 100;
+            }
+            
+            manualProfitLossEl.textContent = manualProfitLoss.toFixed(2);
+            
+            if (manualProfitLoss >= 0) {
+                manualProfitLossEl.classList.add('positive');
+                manualProfitLossEl.classList.remove('negative');
+            } else {
+                manualProfitLossEl.classList.add('negative');
+                manualProfitLossEl.classList.remove('positive');
+            }
+        }
+        
+        function showAlert(message, type) {
+            const alertEl = document.createElement('div');
+            alertEl.className = `alert alert-${type}`;
+            
+            const icon = type === 'buy' ? 'fa-arrow-up' : 
+                         type === 'sell' ? 'fa-arrow-down' : 
+                         type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            alertEl.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <div>${message}</div>
+            `;
+            
+            alertContainer.appendChild(alertEl);
+            
+            setTimeout(() => {
+                alertEl.style.opacity = '0';
+                setTimeout(() => {
+                    alertEl.remove();
+                }, 300);
+            }, 5000);
+        }
+        
+        function addSignalToHistory(message) {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString();
+            const date = now.toLocaleDateString();
+            
+            signalHistory.unshift({
+                timestamp: `${date} ${timestamp}`,
+                message: message
+            });
+            
+            // Keep only the last 100 signals
+            if (signalHistory.length > 100) {
+                signalHistory.pop();
+            }
+            
+            updateSignalHistoryDisplay();
+        }
+        
+        function addTransactionToHistory(message) {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString();
+            const date = now.toLocaleDateString();
+            
+            transactionHistory.unshift({
+                timestamp: `${date} ${timestamp}`,
+                message: message
+            });
+            
+            // Keep only the last 50 transactions
+            if (transactionHistory.length > 50) {
+                transactionHistory.pop();
+            }
+            
+            updateTransactionHistoryDisplay();
+        }
+        
+        function updateSignalHistoryDisplay() {
+            signalHistoryEl.innerHTML = '';
+            
+            if (signalHistory.length === 0) {
+                signalHistoryEl.innerHTML = '<div class="signal-item"><div class="signal-time">No signals yet. Activate strategies to begin.</div></div>';
+                return;
+            }
+            
+            signalHistory.forEach(signal => {
+                const signalEl = document.createElement('div');
+                signalEl.className = 'signal-item';
+                
+                if (signal.message.startsWith('BUY')) {
+                    signalEl.classList.add('signal-buy');
+                } else if (signal.message.startsWith('SELL')) {
+                    signalEl.classList.add('signal-sell');
+                }
+                
+                const action = signal.message.split(':')[0];
+                const details = signal.message.split(':').slice(1).join(':');
+                
+                signalEl.innerHTML = `
+                    <div class="signal-time">${signal.timestamp}</div>
+                    <div class="signal-action">${action}</div>
+                    <div class="signal-details">${details.trim()}</div>
+                `;
+                signalHistoryEl.appendChild(signalEl);
+            });
+        }
+        
+        function updateTransactionHistoryDisplay() {
+            transactionHistoryEl.innerHTML = '';
+            
+            if (transactionHistory.length === 0) {
+                transactionHistoryEl.innerHTML = '<div class="signal-item"><div class="signal-time">No transactions yet.</div></div>';
+                return;
+            }
+            
+            transactionHistory.forEach(tx => {
+                const txEl = document.createElement('div');
+                txEl.className = 'signal-item';
+                
+                if (tx.message.startsWith('BUY')) {
+                    txEl.classList.add('signal-buy');
+                } else if (tx.message.startsWith('SELL')) {
+                    txEl.classList.add('signal-sell');
+                }
+                
+                txEl.innerHTML = `
+                    <div class="signal-time">${tx.timestamp}</div>
+                    <div class="signal-action">${tx.message}</div>
+                `;
+                transactionHistoryEl.appendChild(txEl);
+            });
+        }
+        
+        function updatePortfolio() {
+            btcHoldingsEl.textContent = btcHoldings.toFixed(6);
+            cashReserveEl.textContent = cashReserve.toFixed(2);
+            
+            const avgBuyPrice = totalBtcBought > 0 ? totalInvested / totalBtcBought : 0;
+            avgBuyPriceEl.textContent = avgBuyPrice.toFixed(2);
+            
+            const portfolioValue = cashReserve + (btcHoldings * currentPrice);
+            portfolioValueEl.textContent = portfolioValue.toFixed(2);
+            
+            const initialCapital = parseFloat(document.getElementById('initialCapital').value);
+            const profitLoss = ((portfolioValue - initialCapital) / initialCapital) * 100;
+            profitLossEl.textContent = profitLoss.toFixed(2);
+            
+            if (profitLoss >= 0) {
+                profitLossEl.classList.add('positive');
+                profitLossEl.classList.remove('negative');
+            } else {
+                profitLossEl.classList.add('negative');
+                profitLossEl.classList.remove('positive');
+            }
+        }
+        
+        function clearSignalHistory() {
+            signalHistory = [];
+            updateSignalHistoryDisplay();
+            showAlert('Signal history cleared', 'info');
+        }
+        
+        function exportSignals() {
+            if (signalHistory.length === 0) {
+                showAlert('No signals to export', 'info');
+                return;
+            }
+            
+            let csvContent = "Timestamp,Action,Details\n";
+            signalHistory.forEach(signal => {
+                const action = signal.message.split(':')[0];
+                const details = signal.message.split(':').slice(1).join(':').trim();
+                csvContent += `"${signal.timestamp}","${action}","${details}"\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `dca-signals-${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Signals exported to CSV', 'info');
+        }
+    </script>
+</body>
+</html>
